@@ -10,6 +10,7 @@ from ais_bench.benchmark.openicl import BaseEvaluator
 from ais_bench.benchmark.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
 from ais_bench.benchmark.datasets.utils.datasets import get_data_path
 from .omnidocbench_dependency import *
+from ais_bench.benchmark.utils.prompt import AIS_CONTENT_TAG, AIS_TEXT_START, AIS_IMAGE_START
 
 from ..base import BaseDataset
 
@@ -23,11 +24,13 @@ class OmniDocBenchDataset(BaseDataset):
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         dataset = []
-
+        text = "Parse the image"
         for item in data:
             item_bak = item.copy()
             item['answer'] = item_bak
-            item['image_url'] = image_path + '/' + item['page_info']['image_path']
+            image_url = image_path + '/' + item['page_info']['image_path']
+            item["content"] = AIS_IMAGE_START + image_url + AIS_CONTENT_TAG \
+                                + AIS_TEXT_START + text + AIS_CONTENT_TAG
             dataset.append(item)
         return Dataset.from_list(dataset)
 
